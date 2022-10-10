@@ -21,8 +21,6 @@ metadata:
     kind: Xl
     name: xl-release
     uid: 8c5a5aa4-7f51-4dd8-bc00-0bd84fff972f
-  resourceVersion: "1961457"
-  uid: e5602e1d-eba0-4b87-9f67-ad86407acdb9
 spec:
   progressDeadlineSeconds: 600
   replicas: 1

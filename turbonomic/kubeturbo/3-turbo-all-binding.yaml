@@ -8,8 +8,6 @@ metadata:
   labels:
     app.kubernetes.io/managed-by: Helm
   name: turbo-all-binding
-  resourceVersion: "1961393"
-  uid: 7ba8a316-f4b6-4de8-9827-c33ee4760db2
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole

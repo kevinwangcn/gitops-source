@@ -5,7 +5,7 @@ data:
       "communicationConfig": {
         "serverMeta": {
           "version": "8.6.2",
-          "turboServer": "http://topology-processor:8080"
+          "turboServer": "http://172.31.17.224:30180"
         },
         "restAPIConfig": {
           "opsManagerUserName": "Turbo_username",
@@ -36,5 +36,3 @@ metadata:
     kind: Xl
     name: xl-release
     uid: 8c5a5aa4-7f51-4dd8-bc00-0bd84fff972f
-  resourceVersion: "1961392"
-  uid: 064d3102-872e-4271-b4a6-911ab9a31647
