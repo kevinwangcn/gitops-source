@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  creationTimestamp: "2022-09-09T13:24:05Z"
+  labels:
+    kubernetes.io/metadata.name: turbonomic
+  name: turbonomic
+  resourceVersion: "49486"
+  uid: d2b2e0b5-6f55-4d8b-9801-85b121ecdc22
+spec:
+  finalizers:
+  - kubernetes
+status:
+  phase: Active

@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  annotations:
+    meta.helm.sh/release-name: xl-release
+    meta.helm.sh/release-namespace: turbonomic
+  creationTimestamp: "2022-09-27T21:45:33Z"
+  labels:
+    app.kubernetes.io/managed-by: Helm
+  name: turbo-user
+  namespace: turbonomic
+  ownerReferences:
+  - apiVersion: charts.helm.k8s.io/v1alpha1
+    blockOwnerDeletion: true
+    controller: true
+    kind: Xl
+    name: xl-release
+    uid: 8c5a5aa4-7f51-4dd8-bc00-0bd84fff972f
+  resourceVersion: "1961391"
+  uid: cbba8151-3cf2-47f0-9a1f-559efdc0814a
