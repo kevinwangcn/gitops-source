@@ -1,0 +1,6 @@
+apiVersion: edge.kyst.kube/v1alpha1
+kind: InventoryDevice
+metadata:
+  name: ocm-hub
+  labels:
+    edge.kyst.kube/device-group-name: ocm-hub

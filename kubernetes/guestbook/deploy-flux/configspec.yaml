@@ -1,0 +1,44 @@
+apiVersion: edge.kyst.kube/v1alpha1
+kind: ConfigSpec
+metadata:
+    name: guestbook
+spec:
+    content:
+        - |
+          apiVersion: apps/v1
+          kind: Deployment
+          metadata:
+            name: guestbook-ui
+            namespace: default
+          spec:
+            replicas: 3
+            revisionHistoryLimit: 3
+            selector:
+              matchLabels:
+                app: guestbook-ui
+            template:
+              metadata:
+                labels:
+                  app: guestbook-ui
+              spec:
+                containers:
+                - image: gcr.io/heptio-images/ks-guestbook-demo:0.2
+                  name: guestbook-ui
+                  ports:
+                  - containerPort: 80
+                  resources:
+                    limits:
+                      cpu: 100m
+                      memory: 64Mi
+        - |
+          apiVersion: v1
+          kind: Service
+          metadata:
+            name: guestbook-ui
+            namespace: default
+          spec:
+            ports:
+            - port: 80
+              targetPort: 80
+            selector:
+              app: guestbook-ui
