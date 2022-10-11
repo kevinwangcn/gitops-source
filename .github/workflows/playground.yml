@@ -1,0 +1,8 @@
+name: Playground
+on: [workflow_dispatch]
+jobs:
+  Play:
+    runs-on: ubuntu-latest
+    steps:
+      - run: git version
+      - run: which bash

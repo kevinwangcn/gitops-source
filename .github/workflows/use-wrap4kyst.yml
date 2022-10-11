@@ -1,0 +1,46 @@
+name: Use wrap4kyst
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "update" ]
+    paths:
+      - "kubernetes/guestbook/manifests/**"
+
+jobs:
+
+  use_wrap4kyst:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    # TODO: Do I still need this if using a built image?
+    - name: Set up Go
+      uses: actions/setup-go@v3
+      with:
+        go-version: 1.17
+
+    - name: Prepare image
+      run: docker pull junatibm/wrap4kyst
+
+    - name: Generate kyst CRs
+      run: ./flux/wrap.sh
+
+    - name: Create a commit
+      uses: github-actions-x/commit@v2.9
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        push-branch: "update"
+        commit-message: "create kyst CRs"
+        force-add: "true"
+        files: kubernetes/guestbook/deploy-flux/
+        name: GitHubActions
+        email: githubactions@nowhere.org
+
+    - name: Create a pull request
+      uses: vsoch/pull-request-action@58a078aed9040e56a85935a37e2544a1b0046e51
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        PULL_REQUEST_BRANCH: "main"
+        PULL_REQUEST_TITLE: "Latest kyst CRs"
+        PULL_REQUEST_BODY: "This is an automated pull request with lastest kyst CRs."
