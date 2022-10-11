@@ -85,22 +85,3 @@ spec:
           secretName: turbonomic-credentials
       - emptyDir: {}
         name: varlog
-status:
-  availableReplicas: 1
-  conditions:
-  - lastTransitionTime: "2022-09-27T21:45:34Z"
-    lastUpdateTime: "2022-09-27T21:45:34Z"
-    message: Deployment has minimum availability.
-    reason: MinimumReplicasAvailable
-    status: "True"
-    type: Available
-  - lastTransitionTime: "2022-09-27T21:45:33Z"
-    lastUpdateTime: "2022-09-27T21:45:34Z"
-    message: ReplicaSet "kubeturbo-7cc65b59cf" has successfully progressed.
-    reason: NewReplicaSetAvailable
-    status: "True"
-    type: Progressing
-  observedGeneration: 1
-  readyReplicas: 1
-  replicas: 1
-  updatedReplicas: 1
