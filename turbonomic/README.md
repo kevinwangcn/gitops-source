@@ -54,7 +54,7 @@ spec:
     server: https://kubernetes.default.svc
   project: default
   source:
-    path: turbonomic/kubeturbo/
+    path: turbonomic/kubeturbo/manifests/
     repoURL: https://github.com/edge-experiments/gitops-source.git
     targetRevision: main
   syncPolicy:
