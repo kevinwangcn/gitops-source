@@ -38,7 +38,7 @@ argocd-server-7c85877d9d-cg2p6                      2m           28Mi
 Thus it is viable to use the pull mode to install and maintain kubeturbo.
 Pull mode also makes more sense from the security and scalability points of view.
 
-First, install Argo CD on a kind cluster. Then:
+First, install Argo CD on a cluster. Then:
 ```console
 ubuntu@ip-172-31-31-125:~$ kubectl config current-context
 kind-cluster1
@@ -54,7 +54,7 @@ spec:
     server: https://kubernetes.default.svc
   project: default
   source:
-    path: turbonomic/kubeturbo/
+    path: turbonomic/kubeturbo/manifests/
     repoURL: https://github.com/edge-experiments/gitops-source.git
     targetRevision: main
   syncPolicy:
@@ -73,3 +73,21 @@ NAME                                   DESIRED   CURRENT   READY   AGE
 replicaset.apps/kubeturbo-7866f446cb   1         1         1       6m14s
 ```
 A new Target shows up in Turbonomic UI.
+
+#### Customization for multiple clusters
+With Argo CD installed:
+```shell
+kubectl -n argocd apply -f turbonomic/kubeturbo/argocd-app-cluster1.yaml
+```
+
+A Target named `Kubernetes-Turbonomic-Cluster1` will appear in Turbonomic UI.
+In the UI, go to "SETTINGS" -> "Target Configuration", check the Target, click "VALIDATE".
+Then the log of kubeturbo should show something similar to:
+```
+I1013 17:07:36.089183       1 turbo_probe.go:126] Validate Target: [key:"targetIdentifier" stringValue:"Kubernetes-Turbonomic-Cluster1" key:"masterHost" stringValue:"https://10.96.0.1:443" key:"serverVersion" stringValue:"v1.25.2" key:"image" stringValue:"docker.io/turbonomic/kubeturbo:8.6.2" key:"imageID" stringValue:"sha256:1813c1df04d3e29fdb9fa6634cf82927ec64aae38c4bbc1d08a1771c3a1649fc" key:"probeVersion" stringValue:"8.6.2"]
+I1013 17:07:36.089366       1 k8s_discovery_client.go:196] Validating Kubernetes target...
+I1013 17:07:36.097257       1 cluster_processor.go:119] There are 1 nodes.
+I1013 17:07:36.132793       1 cluster_processor.go:79] Successfully verified node cluster1-control-plane.
+I1013 17:07:36.132823       1 cluster_processor.go:137] Successfully connected to at least some nodes.
+I1013 17:07:36.132849       1 k8s_discovery_client.go:212] Successfully validated target.
+```
