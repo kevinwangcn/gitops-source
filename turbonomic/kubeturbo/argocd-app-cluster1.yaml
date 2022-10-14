@@ -1,0 +1,17 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kubeturbo
+  namespace: argocd
+spec:
+  destination:
+    namespace: turbonomic
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    path: turbonomic/kubeturbo/deploy-cluster1/
+    repoURL: https://github.com/edge-experiments/gitops-source.git
+    targetRevision: main
+  syncPolicy:
+    automated:
+      prune: true
