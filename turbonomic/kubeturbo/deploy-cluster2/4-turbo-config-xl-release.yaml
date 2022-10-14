@@ -1,0 +1,25 @@
+apiVersion: v1
+data:
+  turbo.config: |-
+    {
+      "communicationConfig": {
+        "serverMeta": {
+          "version": "8.6.2",
+          "turboServer": "http://172.31.17.224:30180"
+        },
+        "restAPIConfig": {
+          "opsManagerUserName": "Turbo_username",
+          "opsManagerPassword": "Turbo_password"
+        }
+      },
+      "HANodeConfig": {
+        "nodeRoles": ["master"]
+      },
+      "targetConfig": {
+        "targetName": "Turbonomic-Cluster2"
+      }
+    }
+kind: ConfigMap
+metadata:
+  name: turbo-config-xl-release
+  namespace: turbonomic
