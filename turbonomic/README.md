@@ -91,3 +91,13 @@ I1013 17:07:36.132793       1 cluster_processor.go:79] Successfully verified nod
 I1013 17:07:36.132823       1 cluster_processor.go:137] Successfully connected to at least some nodes.
 I1013 17:07:36.132849       1 k8s_discovery_client.go:212] Successfully validated target.
 ```
+
+#### Dummy workloads on clusters
+Some dummy [workloads](turbonomic/workloads) can be used to simulate unbalanced workloads across the clusters.
+For example, calculation of pi is CPU intensive:
+```
+$ kubectl top po
+NAME                       CPU(cores)   MEMORY(bytes)   
+pi-nf8gm                   1000m        12Mi
+```
+This imbalance should affect Turbonomic's scheduling decisions for incoming workloads.
