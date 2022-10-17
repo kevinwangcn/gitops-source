@@ -1,0 +1,8 @@
+data:
+  resource.exclusions: |
+    - apiGroups:
+      - "tenancy.kcp.dev"
+      kinds:
+      - "ClusterWorkspace"
+      clusters:
+      - "*"
