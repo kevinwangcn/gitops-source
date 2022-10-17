@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   namespace: default
-  name: blue-index
+  name: my-index
 data:
   my-index.html: |
     <!DOCTYPE html>
