@@ -52,7 +52,7 @@ $ kubectl label synctarget cluster2 color=blue
 synctarget.workload.kcp.dev/cluster2 labeled
 ```
 
-### Using GitOps tools
+### Use GitOps tools
 First, use your favorite GitOps tools to deliver scheduling manifests in [scheduling/](scheduling/).
 
 For example, with Argo CD:
@@ -70,7 +70,7 @@ For green nginx, with Argo CD:
 argocd app create deploy-green \
 --repo https://github.com/edge-experiments/gitops-source.git \
 --path kcp/nginx/deploy-green/ \
---dest-server https://172.31.31.125:6443/clusters/root:my-org \
+--dest-server https://172.31.31.125:6443/clusters/root:my-org
 ```
 Sync the Argo CD Application:
 ```shell
@@ -82,7 +82,7 @@ For blue nginx, with Argo CD:
 argocd app create deploy-blue \
 --repo https://github.com/edge-experiments/gitops-source.git \
 --path kcp/nginx/deploy-blue/ \
---dest-server https://172.31.31.125:6443/clusters/root:my-org \
+--dest-server https://172.31.31.125:6443/clusters/root:my-org
 ```
 Sync the Argo CD Application:
 ```shell
@@ -93,6 +93,17 @@ argocd app sync deploy-blue
 #### Green workload
 ```console
 $ docker exec -it cluster1-control-plane bash
+root@cluster1-control-plane:/# kubectl get svc,deploy,po -l app=nginx -A
+NAMESPACE          NAME                  TYPE       CLUSTER-IP     EXTERNAL-IP   PORT(S)        AGE
+kcp-bzj3fcbq6cqj   service/green-nginx   NodePort   10.96.72.227   <none>        80:32064/TCP   12m
+
+NAMESPACE          NAME                          READY   UP-TO-DATE   AVAILABLE   AGE
+kcp-bzj3fcbq6cqj   deployment.apps/green-nginx   3/3     3            3           12m
+
+NAMESPACE          NAME                               READY   STATUS    RESTARTS   AGE
+kcp-bzj3fcbq6cqj   pod/green-nginx-7d89cdb996-f9wnn   1/1     Running   0          12m
+kcp-bzj3fcbq6cqj   pod/green-nginx-7d89cdb996-ptcjn   1/1     Running   0          12m
+kcp-bzj3fcbq6cqj   pod/green-nginx-7d89cdb996-pxhc7   1/1     Running   0          12m
 root@cluster1-control-plane:/# curl localhost:32064
 <!DOCTYPE html>
 <html>
@@ -124,6 +135,17 @@ Commercial support is available at
 #### Blue workload
 ```console
 $ docker exec -it cluster2-control-plane bash
+root@cluster2-control-plane:/# kubectl get svc,deploy,po -l app=nginx -A
+NAMESPACE          NAME                 TYPE       CLUSTER-IP     EXTERNAL-IP   PORT(S)        AGE
+kcp-mdjud4pr2yfy   service/blue-nginx   NodePort   10.96.198.78   <none>        80:32064/TCP   16m
+
+NAMESPACE          NAME                         READY   UP-TO-DATE   AVAILABLE   AGE
+kcp-mdjud4pr2yfy   deployment.apps/blue-nginx   3/3     3            3           16m
+
+NAMESPACE          NAME                              READY   STATUS    RESTARTS   AGE
+kcp-mdjud4pr2yfy   pod/blue-nginx-6b57bb798c-4g6z5   1/1     Running   0          16m
+kcp-mdjud4pr2yfy   pod/blue-nginx-6b57bb798c-69kmc   1/1     Running   0          16m
+kcp-mdjud4pr2yfy   pod/blue-nginx-6b57bb798c-wgf74   1/1     Running   0          16m
 root@cluster2-control-plane:/# curl localhost:32064
 <!DOCTYPE html>
 <html>
