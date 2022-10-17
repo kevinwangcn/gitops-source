@@ -1,22 +1,21 @@
-Examples of scheduling customized workloads to multiple clusters, using kcp as the control plane.
+### Overview
+This example uses GitOps to deliver a blue-green deployment of nginx, as well as its scheduling decisions, to kcp. Kcp then schedules the workloads to two kcp pclusters by executing the scheduling decisions. 'Green nginx' is scheduled from `color: green` namespaces to `color: green` synctargets. The same is true for blue.
 
-## Scenario 1
-Scenario 1 simuates a simple blue-green deployment. Works great!
 ```text
              ┌─my-org workspace────┐  ┌─TMC─┐
              │                     │  │     │
              │ ┌─green ns────────┐ │  │     │   ┌─pcluster1───────┐
-   kustomize │ │                 │ │  │     │   │                 │
+   gitops    │ │                 │ │  │     │   │                 │
   ┌──────────┼─┼─► green nginx ──┼─┼──┼─────┼───┼─► green nginx   │
   │          │ │                 │ │  │     │   │                 │
   │          │ └─────────────────┘ │  │     │   └─────────────────┘
   │          │                     │  │     │
-  │          │                     │  │     │
-nginx        │                     │  │     │
-  │          │                     │  │     │
+workloads    │                     │  │     │
+and          │                     │  │     │
+scheduling   │                     │  │     │
   │          │                     │  │     │
   │          │ ┌─blue  ns────────┐ │  │     │   ┌─pcluster2───────┐
-  │kustomize │ │                 │ │  │     │   │                 │
+  │gitops    │ │                 │ │  │     │   │                 │
   └──────────┼─┼─► blue  nginx ──┼─┼──┼─────┼───┼─► blue  nginx   │
              │ │                 │ │  │     │   │                 │
              │ └─────────────────┘ │  │     │   └─────────────────┘
@@ -24,49 +23,6 @@ nginx        │                     │  │     │
              └─────────────────────┘  └─────┘
 ```
 
-## Scenario 2
-Scenario 2 tries to handle two blue clusters.
-```text
-             ┌─my-org workspace────┐  ┌─TMC─┐
-             │                     │  │     │
-             │ ┌─green ns────────┐ │  │     │   ┌─pcluster1───────┐
-   kustomize │ │                 │ │  │     │   │                 │
-  ┌──────────┼─┼─► green nginx ──┼─┼──┼─────┼───┼─► green nginx   │
-  │          │ │                 │ │  │     │   │                 │
-  │          │ └─────────────────┘ │  │     │   └─────────────────┘
-  │          │                     │  │     │
-  │          │                     │  │     │   ┌─pcluster2───────┐
-nginx        │                     │  │     │   │                 │
-  │          │                     │  │  ┌──┼───┼─► blue  nginx   │
-  │          │ ┌─blue  ns────────┐ │  │  │  │   │                 │
-  │kustomize │ │                 │ │  │  │  │   └─────────────────┘
-  └──────────┼─┼─► blue  nginx ──┼─┼──┼─ ?  │
-             │ │                 │ │  │  │  │   ┌─pcluster3───────┐
-             │ └─────────────────┘ │  │  │  │   │                 │
-             │                     │  │  └──┼───┼─► blue  nginx   │
-             │                     │  │     │   │                 │
-             └─────────────────────┘  └─────┘   └─────────────────┘
-```
-
-Observations/thoughts with Scenario 2:
-- It is observed that blue nginx is scheduled to exactly one pcluster at any time, which is captured by the `internal.workload.kcp.dev/synctarget` annotation on blue placement;
-```console
-$ kubectl get placement blue -oyaml
-apiVersion: scheduling.kcp.dev/v1alpha1
-kind: Placement
-metadata:
-  annotations:
-    internal.workload.kcp.dev/synctarget: 97C5IAVqAokfA7cdMAexezYCp3dsdEdSXQ4oQr
-    kcp.dev/cluster: root:my-org
-```
-- It looks like TMC selects that one pcluster [randomly](https://github.com/kcp-dev/kcp/blob/e33522c3e45bd8292d0893512293d640fe526209/pkg/reconciler/workload/placement/placement_reconcile_scheduling.go#L82);
-- It is observed that TMC has 'failover' behavior ---  if pcluster2 is killed, blue nginx gets scheduled to pcluster3;
-- For edge scenarios we want a way to write one Placement-ish object for blue and get nginx scheduled and synced to _every_ blue pcluster.
-
-## Scenario 1 - steps to reproduce
-Steps to reproduce Scenario 1 are listed as follows.
-
-Steps to reproduce Scenario 2 are quite similar to those of Scenario 1 --- omitted here.
 ### Setup kcp and managed clusters
 [kcp-skupper](https://github.com/ch007m/kcp-skupper) is used for quick setup of kcp.
 [kind](https://kind.sigs.k8s.io/) is used to setup the pclusters/synctargets.
@@ -76,10 +32,7 @@ Kubernetes services are not synced by default, so it is necessary to explicitly 
 $ ../kcp.sh syncer -w my-org -c cluster1 -r services
 ```
 
-### Setup scheduling
-Green workloads are scheduled by kcp's [TMC](https://github.com/kcp-dev/kcp/blob/main/docs/locations-and-scheduling.md), from `color: green` namespaces to `color: green` synctargets.
-The same is true for blue.
-
+### Before using GitOps tools
 Cleanup default scheduling:
 ```console
 $ kubectl delete placement default
@@ -96,75 +49,21 @@ $ kubectl label synctarget cluster2 color=blue
 synctarget.workload.kcp.dev/cluster2 labeled
 ```
 
-Apply other scheduling manifests:
-```console
-$ kubectl apply -f examples/kcp/nginx/scheduling/
-location.scheduling.kcp.dev/green created
-location.scheduling.kcp.dev/blue created
-namespace/green created
-namespace/blue created
-placement.scheduling.kcp.dev/green created
-placement.scheduling.kcp.dev/blue created
+### Using GitOps tools
+First, use your favorite GitOps tools to deliver scheduling manifests in [kcp/nginx/scheduling/](kcp/nginx/scheduling/).
+
+For example:
+```
+argocd app create scheduling \
+--repo https://github.com/edge-experiments/gitops-source.git \
+--path kcp/nginx/scheduling/ \
+--dest-server https://172.31.31.125:6443/clusters/root:my-org
 ```
 
-### Run customized workloads
+Then, deliver workload (nginx) manifests in [kcp/nginx/deploy-blue/](kcp/nginx/deploy-blue/) and [kcp/nginx/deploy-green/](kcp/nginx/deploy-green/).
 
-#### Green workload
-Deploy:
-```console
-$ kubectl apply -k examples/kcp/nginx/deploy-green/
-serviceaccount/nginx created
-configmap/green-index created
-configmap/my-index created
-configmap/nginx created
-service/nginx created
-deployment.apps/nginx created
-```
-
-Access:
-```console
-$ docker exec -it cluster1-control-plane bash
-root@cluster1-control-plane:/# curl localhost:32064
-<!DOCTYPE html>
-<html>
-<head>
-<title>Welcome to GREEN nginx!</title>
-<style>
-    body {
-        width: 35em;
-        margin: 0 auto;
-        font-family: Tahoma, Verdana, Arial, sans-serif;
-    }
-</style>
-</head>
-<body>
-<h1>Welcome to GREEN nginx!</h1>
-<p>If you see this page, the nginx web server is successfully installed and
-working. Further configuration is required.</p>
-
-<p>For online documentation and support please refer to
-<a href="http://nginx.org/">nginx.org</a>.<br/>
-Commercial support is available at
-<a href="http://nginx.com/">nginx.com</a>.</p>
-
-<p><em>Thank you for using nginx.</em></p>
-</body>
-</html>
-```
-
-Remove:
-```console
-$ kubectl delete -k examples/kcp/nginx/deploy-green/
-serviceaccount "nginx" deleted
-configmap "green-index" deleted
-configmap "my-index" deleted
-configmap "nginx" deleted
-service "nginx" deleted
-deployment.apps "nginx" deleted
-```
-
+### Check the delivered workloads
 #### Blue workload
-Similar to green workload:
 ```console
 $ docker exec -it cluster2-control-plane bash
 root@cluster2-control-plane:/# curl localhost:32064
@@ -182,6 +81,37 @@ root@cluster2-control-plane:/# curl localhost:32064
 </head>
 <body>
 <h1>Welcome to BLUE nginx!</h1>
+<p>If you see this page, the nginx web server is successfully installed and
+working. Further configuration is required.</p>
+
+<p>For online documentation and support please refer to
+<a href="http://nginx.org/">nginx.org</a>.<br/>
+Commercial support is available at
+<a href="http://nginx.com/">nginx.com</a>.</p>
+
+<p><em>Thank you for using nginx.</em></p>
+</body>
+</html>
+```
+
+#### Green workload
+```console
+$ docker exec -it cluster1-control-plane bash
+root@cluster1-control-plane:/# curl localhost:32064
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to GREEN nginx!</title>
+<style>
+    body {
+        width: 35em;
+        margin: 0 auto;
+        font-family: Tahoma, Verdana, Arial, sans-serif;
+    }
+</style>
+</head>
+<body>
+<h1>Welcome to GREEN nginx!</h1>
 <p>If you see this page, the nginx web server is successfully installed and
 working. Further configuration is required.</p>
 
