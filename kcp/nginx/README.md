@@ -56,7 +56,7 @@ synctarget.workload.kcp.dev/cluster2 labeled
 First, use your favorite GitOps tools to deliver scheduling manifests in [scheduling/](scheduling/).
 
 For example, with Argo CD:
-```
+```shell
 argocd app create scheduling \
 --repo https://github.com/edge-experiments/gitops-source.git \
 --path kcp/nginx/scheduling/ \
@@ -64,6 +64,30 @@ argocd app create scheduling \
 ```
 
 Then, deliver workload (nginx) manifests in [deploy-green/](deploy-green/) and [deploy-blue/](deploy-blue/).
+
+For green nginx, with Argo CD:
+```shell
+argocd app create deploy-green \
+--repo https://github.com/edge-experiments/gitops-source.git \
+--path kcp/nginx/deploy-green/ \
+--dest-server https://172.31.31.125:6443/clusters/root:my-org \
+```
+Sync the Argo CD Application:
+```shell
+argocd app sync deploy-green
+```
+
+For blue nginx, with Argo CD:
+```shell
+argocd app create deploy-blue \
+--repo https://github.com/edge-experiments/gitops-source.git \
+--path kcp/nginx/deploy-blue/ \
+--dest-server https://172.31.31.125:6443/clusters/root:my-org \
+```
+Sync the Argo CD Application:
+```shell
+argocd app sync deploy-blue
+```
 
 ### Check the delivered workloads
 #### Green workload
