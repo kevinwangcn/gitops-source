@@ -2,11 +2,9 @@
 apiVersion: scheduling.kcp.dev/v1alpha1
 kind: Location
 metadata:
-  annotations:
-    kcp.dev/cluster: root:my-org
+  name: green
   labels:
     color: green
-  name: green
 spec:
   instanceSelector:
     matchLabels:
@@ -19,11 +17,9 @@ spec:
 apiVersion: scheduling.kcp.dev/v1alpha1
 kind: Location
 metadata:
-  annotations:
-    kcp.dev/cluster: root:my-org
+  name: blue
   labels:
     color: blue
-  name: blue
 spec:
   instanceSelector:
     matchLabels:
