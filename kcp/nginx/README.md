@@ -1,36 +1,36 @@
 ### Overview
-This example uses GitOps and kcp to simulate a blue-green deployment of nginx.
+This example uses GitOps and [kcp](https://github.com/kcp-dev/kcp) to simulate a blue-green deployment of nginx.
 It is done in two steps:
-1. use GitOps to deliver customized nginx, as well as the scheduling decisions, to kcp;
-2. use kcp to schedule the customized nginx to two kcp pclusters/SyncTargets by executing the scheduling decisions.
+1. use GitOps to deliver customized nginx, as well as the scheduling decisions (described by kcp Placements and Locations), to kcp;
+2. let kcp's [TMC](https://github.com/kcp-dev/kcp/blob/main/docs/locations-and-scheduling.md) schedule the customized nginx to two kcp pclusters/SyncTargets, by executing the scheduling decisions.
 
 ```text
-             ┌─my-org workspace────┐  ┌─TMC─┐
-             │                     │  │     │
-             │ ┌─green ns────────┐ │  │     │   ┌─pcluster1───────┐
-   gitops    │ │                 │ │  │     │   │                 │
-  ┌──────────┼─┼─► green nginx ──┼─┼──┼─────┼───┼─► green nginx   │
-  │          │ │                 │ │  │  ▲  │   │                 │
-  │          │ └─────────────────┘ │  │  │  │   └─────────────────┘
-  │          │                     │  │  │  │
-nginx &      │     placements      │  │  │  │
-scheduling ──┼─────────────────────┼──┼──┤  │
-decisions    │     locations       │  │  │  │
-  │          │                     │  │  │  │
-  │          │ ┌─blue  ns────────┐ │  │  │  │   ┌─pcluster2───────┐
-  │gitops    │ │                 │ │  │  ▼  │   │                 │
-  └──────────┼─┼─► blue  nginx ──┼─┼──┼─────┼───┼─► blue  nginx   │
-             │ │                 │ │  │     │   │                 │
-             │ └─────────────────┘ │  │     │   └─────────────────┘
-             │                     │  │     │
-             └─────────────────────┘  └─────┘
+                      ┌─my-org workspace──────┐  ┌─TMC─┐
+                      │                       │  │     │
+                      │  ┌─green ns────────┐  │  │     │   ┌─pcluster1───────┐
+          gitops      │  │                 │  │  │     │   │                 │
+       ┌──────────────┼──┼─► green nginx ──┼──┼──┼──┬──┼───┼─► green nginx   │
+       │              │  │                 │  │  │  ▲  │   │                 │
+┌─git──┴─────┐        │  └─────────────────┘  │  │  │  │   └─────────────────┘
+│            │        │                       │  │  │  │
+│ nginx &    │ gitops │                       │  │  │  │
+│ scheduling ├────────┼─placements, locations─┼──┼──┤  │
+│ decisions  │        │                       │  │  │  │
+│            │        │                       │  │  │  │
+└──────┬─────┘        │  ┌─blue  ns────────┐  │  │  │  │   ┌─pcluster2───────┐
+       │  gitops      │  │                 │  │  │  ▼  │   │                 │
+       └──────────────┼──┼─► blue  nginx ──┼──┼──┼──┴──┼───┼─► blue  nginx   │
+                      │  │                 │  │  │     │   │                 │
+                      │  └─────────────────┘  │  │     │   └─────────────────┘
+                      │                       │  │     │
+                      └───────────────────────┘  └─────┘
 ```
 
-### Setup kcp and managed clusters
+### Setup kcp and kcp pclusters/SyncTargets
 [kcp-skupper](https://github.com/ch007m/kcp-skupper) is used for quick setup of kcp.
-[kind](https://kind.sigs.k8s.io/) is used to setup the pclusters/synctargets.
+[kind](https://kind.sigs.k8s.io/) is used to setup the kcp pclusters/SyncTargets.
 
-Kubernetes services are not synced by default, so it is necessary to explicitly tell kcp syncer to sync them. For example:
+By default, Kubernetes Services are not synced by a kcp syncer, so it is necessary to explicitly tell a syncer to sync them. For example:
 ```console
 $ ../kcp.sh syncer -w my-org -c cluster1 -r services
 ```
@@ -44,7 +44,7 @@ $ kubectl delete location default
 location.scheduling.kcp.dev "default" deleted
 ```
 
-Label the synctargets:
+Label the SyncTargets:
 ```console
 $ kubectl label synctarget cluster1 color=green
 synctarget.workload.kcp.dev/cluster1 labeled
@@ -56,36 +56,40 @@ synctarget.workload.kcp.dev/cluster2 labeled
 First, use your favorite GitOps tools to deliver scheduling manifests in [scheduling/](scheduling/).
 
 For example, with Argo CD:
-```shell
+```console
 argocd app create scheduling \
 --repo https://github.com/edge-experiments/gitops-source.git \
 --path kcp/nginx/scheduling/ \
 --dest-server https://172.31.31.125:6443/clusters/root:my-org
 ```
+Sync the Argo CD Application:
+```console
+argocd app sync scheduling
+```
 
 Then, deliver workload (nginx) manifests in [deploy-green/](deploy-green/) and [deploy-blue/](deploy-blue/).
 
 For green nginx, with Argo CD:
-```shell
+```console
 argocd app create deploy-green \
 --repo https://github.com/edge-experiments/gitops-source.git \
 --path kcp/nginx/deploy-green/ \
 --dest-server https://172.31.31.125:6443/clusters/root:my-org
 ```
 Sync the Argo CD Application:
-```shell
+```console
 argocd app sync deploy-green
 ```
 
 For blue nginx, with Argo CD:
-```shell
+```console
 argocd app create deploy-blue \
 --repo https://github.com/edge-experiments/gitops-source.git \
 --path kcp/nginx/deploy-blue/ \
 --dest-server https://172.31.31.125:6443/clusters/root:my-org
 ```
 Sync the Argo CD Application:
-```shell
+```console
 argocd app sync deploy-blue
 ```
 
