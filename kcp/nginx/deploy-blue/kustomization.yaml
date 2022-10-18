@@ -5,10 +5,9 @@ namespace: blue
 
 resources:
 - ../manifests
-- configmap-blue-index.yaml
 
 patchesStrategicMerge:
-- deployment-nginx-patch.yaml
+- configmap-my-index.yaml
 
 patches:
 - patch: |-

@@ -5,10 +5,9 @@ namespace: green
 
 resources:
 - ../manifests
-- configmap-green-index.yaml
 
 patchesStrategicMerge:
-- deployment-nginx-patch.yaml
+- configmap-my-index.yaml
 
 patches:
 - patch: |-
