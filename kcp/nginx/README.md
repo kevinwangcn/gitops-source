@@ -60,7 +60,8 @@ For example, with Argo CD:
 argocd app create scheduling \
 --repo https://github.com/edge-experiments/gitops-source.git \
 --path kcp/nginx/scheduling/ \
---dest-server https://172.31.31.125:6443/clusters/root:my-org:edge
+--dest-server https://172.31.31.125:6443/clusters/root:my-org:edge \
+--sync-policy automated
 ```
 Sync the Argo CD Application:
 ```console
@@ -74,7 +75,8 @@ For green nginx, with Argo CD:
 argocd app create deploy-green \
 --repo https://github.com/edge-experiments/gitops-source.git \
 --path kcp/nginx/deploy-green/ \
---dest-server https://172.31.31.125:6443/clusters/root:my-org:edge
+--dest-server https://172.31.31.125:6443/clusters/root:my-org:edge \
+--sync-policy automated
 ```
 Sync the Argo CD Application:
 ```console
@@ -86,7 +88,8 @@ For blue nginx, with Argo CD:
 argocd app create deploy-blue \
 --repo https://github.com/edge-experiments/gitops-source.git \
 --path kcp/nginx/deploy-blue/ \
---dest-server https://172.31.31.125:6443/clusters/root:my-org:edge
+--dest-server https://172.31.31.125:6443/clusters/root:my-org:edge \
+--sync-policy automated
 ```
 Sync the Argo CD Application:
 ```console
