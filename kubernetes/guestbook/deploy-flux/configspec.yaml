@@ -11,7 +11,7 @@ spec:
             name: guestbook-ui
             namespace: default
           spec:
-            replicas: 4
+            replicas: 3
             revisionHistoryLimit: 3
             selector:
               matchLabels:
