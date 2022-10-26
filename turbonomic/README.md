@@ -93,7 +93,7 @@ I1013 17:07:36.132849       1 k8s_discovery_client.go:212] Successfully validate
 ```
 
 #### Dummy workloads on clusters
-Some dummy [workloads](turbonomic/workloads) can be used to simulate unbalanced workloads across the clusters.
+Some [dummy workloads](/turbonomic/dummy/) can be used to simulate unbalanced workloads across the clusters.
 For example, calculation of pi is CPU intensive:
 ```
 $ kubectl top po
