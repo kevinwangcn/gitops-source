@@ -1,11 +1,11 @@
 ### Overview
-This example is similar to the [blud-green deployment](/kcp/nginx/README.md).
+This example is similar to the [blue-green deployment](/kcp/nginx/README.md).
 The major difference is that, this example uses one single namespace and one single Placement.
 In this example, nginx can be rescheduled from one edge cluster (i.e. kcp pcluster) to another,
 by changing the `optimized` Placement and commit the change to git.
 
 For example, one can change from `aisle: "2"` to `aisle: "1"`,
-so that nginx is scheduled from some cluster located in aisle 1 to some cluster located in aisle 2.
+so that nginx is scheduled from some cluster located in aisle 2 to some cluster located in aisle 1.
 
 ### Before using GitOps tools
 Cleanup default scheduling:
