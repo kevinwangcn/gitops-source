@@ -1,0 +1,17 @@
+---
+apiVersion: scheduling.kcp.dev/v1alpha1
+kind: Placement
+metadata:
+  name: optimized
+spec:
+  locationResource:
+    group: workload.kcp.dev
+    resource: synctargets
+    version: v1alpha1
+  locationSelectors:
+  - matchLabels:
+      aisle: "2"
+  locationWorkspace: root:my-org:edge
+  namespaceSelector:
+    matchLabels:
+      optimizer: turbonomic

@@ -1,0 +1,30 @@
+---
+apiVersion: scheduling.kcp.dev/v1alpha1
+kind: Location
+metadata:
+  name: aisle1
+  labels:
+    aisle: "1"
+spec:
+  instanceSelector:
+    matchLabels:
+      aisle: "1"
+  resource:
+    group: workload.kcp.dev
+    resource: synctargets
+    version: v1alpha1
+---
+apiVersion: scheduling.kcp.dev/v1alpha1
+kind: Location
+metadata:
+  name: aisle2
+  labels:
+    aisle: "2"
+spec:
+  instanceSelector:
+    matchLabels:
+      aisle: "2"
+  resource:
+    group: workload.kcp.dev
+    resource: synctargets
+    version: v1alpha1

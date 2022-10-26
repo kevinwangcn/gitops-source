@@ -101,17 +101,17 @@ argocd app sync deploy-blue
 ```console
 $ docker exec -it cluster1-control-plane bash
 root@cluster1-control-plane:/# kubectl get svc,deploy,po -l app=nginx -A
-NAMESPACE          NAME                  TYPE       CLUSTER-IP     EXTERNAL-IP   PORT(S)        AGE
-kcp-bzj3fcbq6cqj   service/green-nginx   NodePort   10.96.72.227   <none>        80:32064/TCP   12m
+NAMESPACE          NAME                  TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)   AGE
+kcp-1guc3h85a3b0   service/green-nginx   ClusterIP   10.96.144.90    <none>        80/TCP    6d23h
 
 NAMESPACE          NAME                          READY   UP-TO-DATE   AVAILABLE   AGE
-kcp-bzj3fcbq6cqj   deployment.apps/green-nginx   3/3     3            3           12m
+kcp-1guc3h85a3b0   deployment.apps/green-nginx   3/3     3            3           6d23h
 
-NAMESPACE          NAME                               READY   STATUS    RESTARTS   AGE
-kcp-bzj3fcbq6cqj   pod/green-nginx-7d89cdb996-f9wnn   1/1     Running   0          12m
-kcp-bzj3fcbq6cqj   pod/green-nginx-7d89cdb996-ptcjn   1/1     Running   0          12m
-kcp-bzj3fcbq6cqj   pod/green-nginx-7d89cdb996-pxhc7   1/1     Running   0          12m
-root@cluster1-control-plane:/# curl localhost:32064
+NAMESPACE          NAME                              READY   STATUS    RESTARTS   AGE
+kcp-1guc3h85a3b0   pod/green-nginx-7b86884c4-5mcz4   1/1     Running   0          6d23h
+kcp-1guc3h85a3b0   pod/green-nginx-7b86884c4-p2zgf   1/1     Running   0          6d23h
+kcp-1guc3h85a3b0   pod/green-nginx-7b86884c4-q5x7t   1/1     Running   0          6d23h
+root@cluster1-control-plane:/# curl 10.96.144.90
 <!DOCTYPE html>
 <html>
 <head>
@@ -143,17 +143,17 @@ Commercial support is available at
 ```console
 $ docker exec -it cluster2-control-plane bash
 root@cluster2-control-plane:/# kubectl get svc,deploy,po -l app=nginx -A
-NAMESPACE          NAME                 TYPE       CLUSTER-IP     EXTERNAL-IP   PORT(S)        AGE
-kcp-mdjud4pr2yfy   service/blue-nginx   NodePort   10.96.198.78   <none>        80:32064/TCP   16m
+NAMESPACE          NAME                 TYPE        CLUSTER-IP    EXTERNAL-IP   PORT(S)   AGE
+kcp-35774k02n7jg   service/blue-nginx   ClusterIP   10.96.10.43   <none>        80/TCP    7d
 
 NAMESPACE          NAME                         READY   UP-TO-DATE   AVAILABLE   AGE
-kcp-mdjud4pr2yfy   deployment.apps/blue-nginx   3/3     3            3           16m
+kcp-35774k02n7jg   deployment.apps/blue-nginx   3/3     3            3           7d
 
 NAMESPACE          NAME                              READY   STATUS    RESTARTS   AGE
-kcp-mdjud4pr2yfy   pod/blue-nginx-6b57bb798c-4g6z5   1/1     Running   0          16m
-kcp-mdjud4pr2yfy   pod/blue-nginx-6b57bb798c-69kmc   1/1     Running   0          16m
-kcp-mdjud4pr2yfy   pod/blue-nginx-6b57bb798c-wgf74   1/1     Running   0          16m
-root@cluster2-control-plane:/# curl localhost:32064
+kcp-35774k02n7jg   pod/blue-nginx-65bd57bccb-6fbkf   1/1     Running   0          6d18h
+kcp-35774k02n7jg   pod/blue-nginx-65bd57bccb-7h4b2   1/1     Running   0          6d18h
+kcp-35774k02n7jg   pod/blue-nginx-65bd57bccb-d4zwm   1/1     Running   0          6d18h
+root@cluster2-control-plane:/# curl 10.96.10.43
 <!DOCTYPE html>
 <html>
 <head>
