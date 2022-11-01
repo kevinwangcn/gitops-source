@@ -1,4 +1,3 @@
----
 apiVersion: scheduling.kcp.dev/v1alpha1
 kind: Placement
 metadata:
@@ -11,7 +10,7 @@ spec:
   locationSelectors:
   - matchLabels:
       aisle: "2"
-  locationWorkspace: root:my-org:edge
+  locationWorkspace: 1
   namespaceSelector:
     matchLabels:
       optimizer: turbonomic
